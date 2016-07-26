@@ -1,0 +1,19 @@
+net/mac80211/rc80211_minstrel_ht.c 
+
+
+static const struct rate_control_ops mac80211_minstrel_ht = {
+	.name = "minstrel_ht",
+	.tx_status_noskb = minstrel_ht_tx_status,
+	.get_rate = minstrel_ht_get_rate,
+	.rate_init = minstrel_ht_rate_init,
+	.rate_update = minstrel_ht_rate_update,
+	.alloc_sta = minstrel_ht_alloc_sta,
+	.free_sta = minstrel_ht_free_sta,
+	.alloc = minstrel_ht_alloc,
+	.free = minstrel_ht_free,
+#ifdef CPTCFG_MAC80211_DEBUGFS
+	.add_sta_debugfs = minstrel_ht_add_sta_debugfs,
+	.remove_sta_debugfs = minstrel_ht_remove_sta_debugfs,
+#endif
+	.get_expected_throughput = minstrel_ht_get_expected_throughput,
+};
