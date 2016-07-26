@@ -87,10 +87,10 @@ ieee80211_try_rate_control_ops_get(const char *name)//get algo ops according to 
 
     mutex_lock(&rate_ctrl_mutex);
     list_for_each_entry(alg, &rate_ctrl_algs, list) {
-        printk("yez algo= %s", alg->ops->name);
+        // printk("yez algo= %s", alg->ops->name);
         if (!strcmp(alg->ops->name, name)) {
             ops = alg->ops;
-            //break;
+            break;
         }
     }
     mutex_unlock(&rate_ctrl_mutex);
@@ -101,7 +101,7 @@ ieee80211_try_rate_control_ops_get(const char *name)//get algo ops according to 
 static const struct rate_control_ops *
 ieee80211_rate_control_ops_get(const char *name)
 {
-    printk("yez in ieee80211_rate_control_ops_get\n");
+    // printk("yez in ieee80211_rate_control_ops_get\n");
     const struct rate_control_ops *ops;
     const char *alg_name;
 
@@ -111,7 +111,7 @@ ieee80211_rate_control_ops_get(const char *name)
     else
         alg_name = name;
 
-    printk("yezeliang123 alg-name = %s\n",alg_name);
+    // printk("yezeliang123 alg-name = %s\n",alg_name);
     ops = ieee80211_try_rate_control_ops_get(alg_name);
     if (!ops && name)
         /* try default if specific alg requested but not found */
@@ -146,17 +146,15 @@ static const struct file_operations rcname_ops = {
 static struct rate_control_ref *rate_control_alloc(const char *name,
                         struct ieee80211_local *local)
 {
-    printk("yezhappy in rate_control_alloc\n");
+    // printk("yezhappy in rate_control_alloc\n");
     struct dentry *debugfsdir = NULL;
     struct rate_control_ref *ref;
 
     ref = kmalloc(sizeof(struct rate_control_ref), GFP_KERNEL);
     if (!ref)
         return NULL;
-    printk("yez1\n");
     ref->local = local;
     ref->ops = ieee80211_rate_control_ops_get(name);
-    printk("yez2\n");
     if (!ref->ops)
         goto free;
 
@@ -732,27 +730,27 @@ EXPORT_SYMBOL(rate_control_set_rates);
 int ieee80211_init_rate_ctrl_alg(struct ieee80211_local *local,
                  const char *name)
 {
-    printk("yez, %s\n", name);
+    // printk("yez, %s\n", name);
     struct rate_control_ref *ref;
 
     ASSERT_RTNL();
 
     if (local->open_count){
-        printk("yez1\n");
+        // printk("yez1\n");
         return -EBUSY;
     }
         
 
-    // if (ieee80211_hw_check(&local->hw, HAS_RATE_CONTROL)) {
-    //     printk("yez2, %s %d\n",ieee80211_default_rc_algo,HAS_RATE_CONTROL);
-    //     if (WARN_ON(!local->ops->set_rts_threshold))
-    //         return -EINVAL;
-    //     return 0;
-    // }
+    if (ieee80211_hw_check(&local->hw, HAS_RATE_CONTROL)) {
+        // printk("yez2, %s %d\n",ieee80211_default_rc_algo,HAS_RATE_CONTROL);
+        if (WARN_ON(!local->ops->set_rts_threshold))
+            return -EINVAL;
+        return 0;
+    }
 
     ref = rate_control_alloc(name, local);
     if (!ref) {
-        printk("yez3\n");
+        // printk("yez3\n");
         wiphy_warn(local->hw.wiphy,
                "Failed to select rate control algorithm\n");
         return -ENOENT;
